@@ -1,19 +1,10 @@
-import {
-  DynamoDBClient,
-  DescribeTableCommand,
-  ScanCommand,
-} from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 
-// a client can be shared by different commands.
 export const client = new DynamoDBClient({
   region: "eu-north-1",
-  // accessKeyId default can be used while using the downloadable version of DynamoDB.
-  // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
   credentials: {
-    accessKeyId: "AKIAX2DZERUHSLS6BITT",
-    // secretAccessKey default can be used while using the downloadable version of DynamoDB.
-    // For security reasons, do not store AWS Credentials in your files. Use Amazon Cognito instead.
-    secretAccessKey: "QPjdMl6XHcIlXKUqidAai2tQqk3PvGcn6+WpN70h",
+    accessKeyId: process.env.AWS_ACCESS_KEY as string,
+    secretAccessKey: process.env.AWS_SECRET_KEY as string,
   },
 });
 
