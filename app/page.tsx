@@ -11,6 +11,12 @@ export default async function Home() {
   const items = await getItems();
   const price = await getBTCPrice();
   const historical = await getHistoricalBTCPrice();
+
+  async function getPriceOnVoting() {
+    "use server";
+    return (await getBTCPrice()).usd;
+    // ...
+  }
   return (
     <div className="flex flex-col gap-8">
       <header className="text-center mt-12 mb-4 flex flex-col gap-2">
@@ -24,7 +30,7 @@ export default async function Home() {
           <span className="text-muted-foreground">Current points:</span> 0
         </p>
       </header>
-      <Betting price={price} />
+      <Betting price={price} getPriceOnVoting={getPriceOnVoting} />
       <h2 className="font-bold text-center text-xl mb-4">
         Bitcoin prices over the last 24 hours
       </h2>
