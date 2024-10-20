@@ -1,21 +1,16 @@
-import { Button } from "@/components/ui/button";
-import { getItems } from "@/lib/aws";
 import { getBTCPrice, getHistoricalBTCPrice } from "@/lib/coingecko";
 
 import { PriceChart } from "@/components/PriceChart";
-import { formatAMPM } from "@/lib/utils";
-import { ArrowDown, ArrowUp } from "lucide-react";
 import { Betting } from "@/components/Betting";
 
 export default async function Home() {
-  const items = await getItems();
+  // const items = await getItems();
   const price = await getBTCPrice();
   const historical = await getHistoricalBTCPrice();
 
   async function getPriceOnVoting() {
     "use server";
     return (await getBTCPrice()).usd;
-    // ...
   }
   return (
     <div className="flex flex-col gap-8">
@@ -26,7 +21,6 @@ export default async function Home() {
           win points
         </h3>
         <p>
-          {" "}
           <span className="text-muted-foreground">Current points:</span> 0
         </p>
       </header>

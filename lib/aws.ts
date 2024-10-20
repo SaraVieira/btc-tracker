@@ -18,7 +18,7 @@ export const getItems = async () => {
     return data.Items;
     // process data.
   } catch (error) {
-    // error handling.
+    console.error(error);
   } finally {
     // finally.
   }

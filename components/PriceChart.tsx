@@ -74,7 +74,7 @@ const ChartTooltipContent = ({
     <div className="grid gap-1.5">
       <div className="flex w-full flex-wrap gap-2 [&amp;>svg]:h-2.5 [&amp;>svg]:w-2.5 [&amp;>svg]:text-muted-foreground flex-col">
         {Object.keys(payload[0].payload).map((key) => (
-          <div className="flex flex-wrap gap-2">
+          <div key={key} className="flex flex-wrap gap-2">
             <div className="flex flex-1 leading-none items-center justify-start">
               <div className="grid gap-1.5">
                 <span className="text-muted-foreground capitalize">{key}</span>

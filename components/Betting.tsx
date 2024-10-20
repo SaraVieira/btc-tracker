@@ -25,7 +25,7 @@ export const Betting = ({
       setCurrentPrice(data);
     }, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [getPriceOnVoting]);
 
   const vote = async (vote: Vote["vote"]) => {
     const currentPrice = await getPriceOnVoting();
