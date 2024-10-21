@@ -1,12 +1,10 @@
 import {
-  BatchGetItemCommand,
   DynamoDBClient,
   PutItemCommand,
-  QueryCommand,
   ScanCommand,
 } from "@aws-sdk/client-dynamodb";
 
-import { DBITem, Vote } from "./types";
+import { DBITem } from "./types";
 import { randomUUID } from "crypto";
 
 export const client = new DynamoDBClient({
@@ -16,19 +14,6 @@ export const client = new DynamoDBClient({
     secretAccessKey: process.env.AWS_SECRET_KEY as string,
   },
 });
-
-export const getItems = async () => {
-  const getItemsCommand = new ScanCommand({
-    TableName: "btc-tracker",
-  });
-
-  try {
-    const data = await client.send(getItemsCommand);
-    return data.Items;
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 export const sendVote = async (item: DBITem) => {
   const id = randomUUID().toString();
@@ -77,13 +62,17 @@ export const getUserVotes = async (userID: string) => {
 
   try {
     const response = await client.send(command);
-    return response.Items?.map((item) =>
-      parseInt(item.points?.S || "0")
-    ).reduce((acc, curr) => {
-      acc += curr;
+    console.log(response.Items);
+    return (
+      response.Items?.map((item) => parseInt(item.points?.S || "0")).reduce(
+        (acc, curr) => {
+          acc += curr;
 
-      return acc;
-    }, 0);
+          return acc;
+        },
+        0
+      ) || 0
+    );
   } catch (error) {
     console.error(error);
     return 0;

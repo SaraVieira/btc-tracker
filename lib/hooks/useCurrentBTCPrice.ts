@@ -9,13 +9,17 @@ export const useCurrentBTCPrice = ({
 }) => {
   const [currentPrice, setCurrentPrice] = useState(defaultPrice);
 
+  const getCurrentPrice = async () => {
+    const data = await getBTCPrice();
+    setCurrentPrice(data);
+
+    return data;
+  };
+
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const data = await getBTCPrice();
-      setCurrentPrice(data);
-    }, 30000);
+    const interval = setInterval(getCurrentPrice, 30000);
     return () => clearInterval(interval);
   }, [getBTCPrice]);
 
-  return { currentPrice };
+  return { currentPrice, refetch: getCurrentPrice };
 };

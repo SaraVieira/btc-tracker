@@ -4,67 +4,31 @@ import { formatAMPM } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNow } from "@/lib/useNow";
-import { useCurrentBTCPrice } from "@/lib/useCurrentBTCPrice";
-import { DBITem, Vote } from "@/lib/types";
+import { useNow } from "@/lib/hooks/useNow";
+import { DBITem } from "@/lib/types";
+import { useVotes } from "@/lib/hooks/useVotes";
+import { Result } from "./Result";
 
 const seconds = 10;
 
-export const Betting = ({
+export const Voting = ({
   price,
   getBTCPrice,
   saveVoteInDB,
-  getVotes,
 }: {
   price: { usd: number };
   getBTCPrice: () => Promise<number>;
-  saveVoteInDB(item: DBITem): Promise<string | undefined>;
-  getVotes(id: string): Promise<void>;
+  saveVoteInDB: (item: DBITem) => Promise<string | undefined>;
 }) => {
-  const [currentVote, setCurrentVote] = useState<Vote | undefined>();
-  const [currentResult, setCurrentResult] = useState<{
-    userID: string;
-    points: number;
-  } | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const now = useNow();
-  const { currentPrice } = useCurrentBTCPrice({
-    defaultPrice: price.usd,
-    getBTCPrice,
-  });
 
-  const vote = async (vote: Vote["vote"]) => {
-    const currentPrice = await getBTCPrice();
-    const newVote = {
-      userID: "",
-      date: new Date(),
-      price: currentPrice,
-      vote,
-    };
-    setCurrentVote(newVote);
-    setTimeLeft(seconds);
-  };
-
-  const calculatePoints = (currentPrice: number) => {
-    if (!currentVote) return 0;
-    if (currentVote?.vote === "down") {
-      return currentPrice < currentVote.price ? 1 : 0;
-    }
-
-    return currentPrice > currentVote?.price ? 1 : 0;
-  };
-
-  const getResult = async () => {
-    const currentPrice = await getBTCPrice();
-    setCurrentVote(undefined);
-    const vote = {
-      points: calculatePoints(currentPrice),
-      userID: currentVote?.userID!,
-      vote: currentVote?.vote!,
-    };
-    await saveVoteInDB(vote);
-    setCurrentResult(vote);
-  };
+  const { currentResult, currentVote, getResult, vote, currentPrice } =
+    useVotes({
+      saveVoteInDB,
+      defaultPrice: price.usd,
+      getBTCPrice,
+    });
 
   useEffect(() => {
     if (timeLeft) {
@@ -79,12 +43,15 @@ export const Betting = ({
         getResult();
       }
     }
-  }, [now]);
+  }, [now, getResult]);
 
   return (
     <>
-      {currentVote ? JSON.stringify(timeLeft) : null}
-      {currentResult ? JSON.stringify(currentResult) : null}
+      <Result
+        timeLeft={timeLeft}
+        currentResult={currentResult}
+        currentVote={currentVote}
+      />
       <section className="grid sm:grid-cols-2 gap-4 items-center justify-center sm:justify-normal">
         <div className="flex flex-wrap justify-center sm:justify-normal">
           <Button
@@ -92,7 +59,10 @@ export const Betting = ({
             size="lg"
             className="rounded-r-none"
             variant={"success"}
-            onClick={() => vote("up")}
+            onClick={() => {
+              vote("up");
+              setTimeLeft(seconds);
+            }}
           >
             <ArrowUp />
           </Button>
@@ -101,7 +71,10 @@ export const Betting = ({
             size="lg"
             className="rounded-l-none"
             variant={"destructive"}
-            onClick={() => vote("down")}
+            onClick={() => {
+              vote("down");
+              setTimeLeft(seconds);
+            }}
           >
             <ArrowDown />
           </Button>

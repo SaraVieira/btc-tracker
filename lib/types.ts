@@ -12,3 +12,11 @@ export type DBITem = {
   vote: Vote["vote"];
   points?: number;
 };
+
+export type Result = {
+  userID: string;
+  points: number;
+  price: number;
+  betPrice: number;
+  vote: Vote["vote"];
+};
