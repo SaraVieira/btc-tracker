@@ -1,5 +1,7 @@
 # The Bitcoin Game
 
+## What is this?
+
 Simple premise really, every 60 seconds you can vote if the price of bitcoin is gonna go up or down and if you get lucky you get points.
 
 Play the game: https://btc-tracker.deploy.iamsaravieira.com
@@ -34,3 +36,9 @@ yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
+
+## How to deploy
+
+The easiest way to deploy a NextJS application would be to use [Vercel](https://vercel.com/) or [Netlify](https://www.netlify.com/) as both these services will automatically detect it's a NextJS application and do all the required fixes for you.
+
+In my case I deployed using a docker image and to do this you can follow the instructions [in the NextJS docs](https://nextjs.org/docs/app/building-your-application/deploying#docker-image)
