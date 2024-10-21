@@ -1,4 +1,13 @@
-import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
+import {
+  BatchGetItemCommand,
+  DynamoDBClient,
+  PutItemCommand,
+  QueryCommand,
+  ScanCommand,
+} from "@aws-sdk/client-dynamodb";
+
+import { DBITem, Vote } from "./types";
+import { randomUUID } from "crypto";
 
 export const client = new DynamoDBClient({
   region: "eu-north-1",
@@ -16,10 +25,67 @@ export const getItems = async () => {
   try {
     const data = await client.send(getItemsCommand);
     return data.Items;
-    // process data.
   } catch (error) {
     console.error(error);
-  } finally {
-    // finally.
+  }
+};
+
+export const sendVote = async (item: DBITem) => {
+  const id = randomUUID().toString();
+  const sendItemCommand = new PutItemCommand({
+    TableName: "btc-tracker",
+    Item: {
+      id: {
+        S: item.id || id,
+      },
+      userID: {
+        S: item.userID,
+      },
+      timestamp: {
+        S: new Date().toString(),
+      },
+      vote: {
+        S: item.vote,
+      },
+      ...(item.points !== undefined && {
+        points: {
+          S: item.points.toString(),
+        },
+      }),
+    },
+  });
+
+  try {
+    await client.send(sendItemCommand);
+    return id;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+export const getUserVotes = async (userID: string) => {
+  const command = new ScanCommand({
+    ExpressionAttributeValues: {
+      ":ui": {
+        S: userID,
+      },
+    },
+    FilterExpression: "userID = :ui",
+    // ProjectionExpression: "id",
+    TableName: "btc-tracker",
+  });
+
+  try {
+    const response = await client.send(command);
+    return response.Items?.map((item) =>
+      parseInt(item.points?.S || "0")
+    ).reduce((acc, curr) => {
+      acc += curr;
+
+      return acc;
+    }, 0);
+  } catch (error) {
+    console.error(error);
+    return 0;
   }
 };

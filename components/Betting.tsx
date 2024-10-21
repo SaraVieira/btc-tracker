@@ -5,43 +5,90 @@ import { Button } from "./ui/button";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNow } from "@/lib/useNow";
+import { useCurrentBTCPrice } from "@/lib/useCurrentBTCPrice";
+import { DBITem, Vote } from "@/lib/types";
 
-type Vote = { date: Date; price: number; vote: "up" | "down" };
+const seconds = 10;
 
 export const Betting = ({
   price,
-  getPriceOnVoting,
+  getBTCPrice,
+  saveVoteInDB,
+  getVotes,
 }: {
   price: { usd: number };
-  getPriceOnVoting: () => Promise<number>;
+  getBTCPrice: () => Promise<number>;
+  saveVoteInDB(item: DBITem): Promise<string | undefined>;
+  getVotes(id: string): Promise<void>;
 }) => {
-  const [currentVote, setCurrentVote] = useState<
-    { date: Date; price: number; vote: "up" | "down" } | undefined
-  >();
-  const [currentPrice, setCurrentPrice] = useState(price.usd);
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const data = await getPriceOnVoting();
-      setCurrentPrice(data);
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [getPriceOnVoting]);
+  const [currentVote, setCurrentVote] = useState<Vote | undefined>();
+  const [currentResult, setCurrentResult] = useState<{
+    userID: string;
+    points: number;
+  } | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const now = useNow();
+  const { currentPrice } = useCurrentBTCPrice({
+    defaultPrice: price.usd,
+    getBTCPrice,
+  });
 
   const vote = async (vote: Vote["vote"]) => {
-    const currentPrice = await getPriceOnVoting();
-    setCurrentVote({
+    const currentPrice = await getBTCPrice();
+    const newVote = {
+      userID: "",
       date: new Date(),
       price: currentPrice,
       vote,
-    });
+    };
+    setCurrentVote(newVote);
+    setTimeLeft(seconds);
   };
-  const now = useNow(300);
+
+  const calculatePoints = (currentPrice: number) => {
+    if (!currentVote) return 0;
+    if (currentVote?.vote === "down") {
+      return currentPrice < currentVote.price ? 1 : 0;
+    }
+
+    return currentPrice > currentVote?.price ? 1 : 0;
+  };
+
+  const getResult = async () => {
+    const currentPrice = await getBTCPrice();
+    setCurrentVote(undefined);
+    const vote = {
+      points: calculatePoints(currentPrice),
+      userID: currentVote?.userID!,
+      vote: currentVote?.vote!,
+    };
+    await saveVoteInDB(vote);
+    setCurrentResult(vote);
+  };
+
+  useEffect(() => {
+    if (timeLeft) {
+      if (currentVote) {
+        setTimeLeft(
+          seconds - (new Date().getTime() - currentVote.date.getTime()) / 1000
+        );
+      }
+
+      if (Math.floor(timeLeft) === 0 || Math.floor(timeLeft) < 0) {
+        setTimeLeft(null);
+        getResult();
+      }
+    }
+  }, [now]);
+
   return (
     <>
-      {currentVote ? JSON.stringify(currentVote) : null}
+      {currentVote ? JSON.stringify(timeLeft) : null}
+      {currentResult ? JSON.stringify(currentResult) : null}
       <section className="grid sm:grid-cols-2 gap-4 items-center justify-center sm:justify-normal">
-        <div>
+        <div className="flex flex-wrap justify-center sm:justify-normal">
           <Button
+            disabled={Boolean(timeLeft)}
             size="lg"
             className="rounded-r-none"
             variant={"success"}
@@ -50,6 +97,7 @@ export const Betting = ({
             <ArrowUp />
           </Button>
           <Button
+            disabled={Boolean(timeLeft)}
             size="lg"
             className="rounded-l-none"
             variant={"destructive"}

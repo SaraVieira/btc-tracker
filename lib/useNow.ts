@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-export const useNow = (refreshFrequency: number): Date => {
+export const useNow = (): Date => {
   const [now, setNow] = useState(new Date());
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), refreshFrequency);
+    const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   });
   return now;
