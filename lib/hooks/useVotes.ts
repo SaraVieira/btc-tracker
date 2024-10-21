@@ -46,11 +46,10 @@ export const useVotes = ({
 
   const getResult = async () => {
     if (!currentVote?.userID || !currentVote.vote) return;
-    const oldPrice = currentPrice;
     const newPrice = await refetch();
 
     const vote = {
-      points: calculatePoints(oldPrice, newPrice),
+      points: calculatePoints(currentVote.price, newPrice),
       userID: currentVote?.userID,
       vote: currentVote?.vote,
     };
@@ -58,7 +57,7 @@ export const useVotes = ({
     setCurrentResult({
       ...vote,
       price: newPrice,
-      betPrice: oldPrice,
+      betPrice: currentVote.price,
     });
     await getUserPoints();
     setCurrentVote(null);
