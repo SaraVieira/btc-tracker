@@ -24,7 +24,7 @@ export const PriceChart = ({
   historical: { time: string; price: number }[];
 }) => {
   return (
-    <Card className="p-4 max-w-[90vw] m-auto sm:m-0">
+    <Card className="p-4 max-w-[90vw] mx-auto sm:mx-0 mb-12">
       <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
         <LineChart
           margin={{

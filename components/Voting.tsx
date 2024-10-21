@@ -9,7 +9,7 @@ import { DBITem } from "@/lib/types";
 import { useVotes } from "@/lib/hooks/useVotes";
 import { Result } from "./Result";
 
-const seconds = 10;
+const seconds = 60;
 
 export const Voting = ({
   price,
@@ -52,8 +52,8 @@ export const Voting = ({
         currentResult={currentResult}
         currentVote={currentVote}
       />
-      <section className="grid sm:grid-cols-2 gap-4 items-center justify-center sm:justify-normal">
-        <div className="flex flex-wrap justify-center sm:justify-normal">
+      <section className="grid sm:grid-cols-2 gap-4 items-center justify-center">
+        <div className="flex flex-wrap justify-center">
           <Button
             disabled={Boolean(timeLeft)}
             size="lg"
