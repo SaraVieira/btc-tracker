@@ -37,7 +37,7 @@ export default async function Home() {
               Guess if the bitcoin price goes up or down in the next 60 seconds
               and win points
             </h3>
-            <Points getVotes={getVotes} />
+            <Points />
           </header>
           <Voting
             price={price}

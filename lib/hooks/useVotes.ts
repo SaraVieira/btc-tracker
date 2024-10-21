@@ -46,7 +46,7 @@ export const useVotes = ({
 
   const getResult = async () => {
     if (!currentVote?.userID || !currentVote.vote) return;
-    let oldPrice = currentPrice;
+    const oldPrice = currentPrice;
     const newPrice = await refetch();
 
     const vote = {

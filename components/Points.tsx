@@ -2,11 +2,7 @@
 
 import { usePoints } from "@/lib/PointsProvider";
 
-export const Points = ({
-  getVotes,
-}: {
-  getVotes(id: string): Promise<number>;
-}) => {
+export const Points = () => {
   const { votes } = usePoints();
 
   return (

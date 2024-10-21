@@ -56,13 +56,11 @@ export const getUserVotes = async (userID: string) => {
       },
     },
     FilterExpression: "userID = :ui",
-    // ProjectionExpression: "id",
     TableName: "btc-tracker",
   });
 
   try {
     const response = await client.send(command);
-    console.log(response.Items);
     return (
       response.Items?.map((item) => parseInt(item.points?.S || "0")).reduce(
         (acc, curr) => {

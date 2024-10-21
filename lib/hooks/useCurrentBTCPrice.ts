@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const useCurrentBTCPrice = ({
   getBTCPrice,
@@ -9,17 +9,17 @@ export const useCurrentBTCPrice = ({
 }) => {
   const [currentPrice, setCurrentPrice] = useState(defaultPrice);
 
-  const getCurrentPrice = async () => {
+  const getCurrentPrice = useCallback(async () => {
     const data = await getBTCPrice();
     setCurrentPrice(data);
 
     return data;
-  };
+  }, [getBTCPrice]);
 
   useEffect(() => {
     const interval = setInterval(getCurrentPrice, 30000);
     return () => clearInterval(interval);
-  }, [getBTCPrice]);
+  }, [getBTCPrice, getCurrentPrice]);
 
   return { currentPrice, refetch: getCurrentPrice };
 };
