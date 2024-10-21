@@ -2,6 +2,8 @@
 
 Simple premise really, every 60 seconds you can vote if the price of bitcoin is gonna go up or down and if you get lucky you get points.
 
+Play the game: https://btc-tracker.deploy.iamsaravieira.com
+
 ## Running Locally
 
 Required Envs:
